@@ -1,3 +1,7 @@
+app:
+  time:
+    job-enabled: true
+
 ## Tuning mapping for actuator info to '/status' path
 management:
   endpoints:

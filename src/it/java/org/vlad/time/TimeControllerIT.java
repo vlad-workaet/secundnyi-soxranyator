@@ -9,9 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.vlad.IntegrationTest;
+import org.vlad.time.data.MemoryQueue;
 import org.vlad.time.dto.TimeDto;
+import org.vlad.time.job.TimeJobService;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DatabaseSetup(value = "classpath:dbunit/time.xml")
 public class TimeControllerIT extends IntegrationTest {
@@ -20,6 +25,12 @@ public class TimeControllerIT extends IntegrationTest {
 
     @Autowired
     private WebTestClient client;
+
+    @Autowired
+    private TimeJobService timeJobService;
+
+    @Autowired
+    private MemoryQueue memoryQueue;
 
 
     @Test
@@ -40,5 +51,32 @@ public class TimeControllerIT extends IntegrationTest {
                             softly.assertThat(response.get(3).getTime()).isEqualTo(LocalTime.of(10, 10, 3));
                             softly.assertThat(response.get(4).getTime()).isEqualTo(LocalTime.of(10, 10, 4));
                         }));
+    }
+
+
+    @Test
+    void getAll_with_enabled_job() throws InterruptedException {
+        ReflectionTestUtils.setField(timeJobService, "jobEnabled", true);
+
+        Thread.sleep(5_000);
+
+        client.get()
+                .uri(URL_TEMPLATE)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(new ParameterizedTypeReference<List<TimeDto>>() {
+                })
+                .value((response) ->
+                        SoftAssertions.assertSoftly((softly) -> {
+                            softly.assertThat(response.size()).isGreaterThanOrEqualTo(9);
+                        }));
+
+        ReflectionTestUtils.setField(timeJobService, "jobEnabled", false);
+
+        Thread.sleep(2_000);
+
+        assertThat(memoryQueue.getMemoryQueue().size()).isEqualTo(0);
     }
 }

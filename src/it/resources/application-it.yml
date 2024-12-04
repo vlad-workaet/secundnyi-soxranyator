@@ -6,3 +6,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+app:
+  time:
+    job-enabled: false
