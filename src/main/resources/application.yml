@@ -1,0 +1,22 @@
+## Tuning mapping for actuator info to '/status' path
+management:
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        info: status
+        prometheus: metrics
+      exposure:
+        include: health, info, prometheus
+    health:
+      show-components: always
+      show-details: always
+      group:
+        liveness:
+          show-details: always
+        readiness:
+          show-details: always
+
+# logging configuration
+logging:
+  config: config/logback.xml

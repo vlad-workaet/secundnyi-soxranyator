@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <property name="logPrefix" value="logs"/>
+    <property name="appName" value="secundnyi-soxranyator"/>
+    <property name="sleuth"
+              value="[${appName:-appName variable is not specified},%X{traceId:-no-trace-id},%X{spanId:-no-span-id}]"/>
+    <property name="pattern" value="%d{'yyyy-MM-dd HH:mm:ss,SSS Z' GMT} ${sleuth} [%t] [%c{0}] %-6p%m%n"/>
+
+    <!-- CONSOLE -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ROOT -->
+    <appender name="ROOT_APPENDER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPrefix}/root.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPrefix}/old/root.%d{yyyy-MM-dd-HH}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+    <appender name="ROOT_APPENDER_FILE_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ROOT_APPENDER_FILE"/>
+    </appender>
+
+    <!-- ERROR -->
+    <appender name="ERROR_APPENDER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPrefix}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPrefix}/old/error.%d{yyyy-MM-dd-HH}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+    <appender name="ERROR_APPENDER_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ERROR_APPENDER_FILE"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROOT_APPENDER_FILE"/>
+        <appender-ref ref="ERROR_APPENDER_ASYNC"/>
+    </root>
+
+</configuration>
