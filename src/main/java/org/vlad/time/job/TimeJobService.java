@@ -17,7 +17,7 @@ import org.vlad.time.listener.TimeEvent;
 @RequiredArgsConstructor
 public class TimeJobService {
 
-    public static final int CRON = 1000;
+    public static final int FIXED_RATE_MS = 1000;
 
     private final MemoryQueue memoryQueue;
 
@@ -27,11 +27,12 @@ public class TimeJobService {
     private Boolean jobEnabled;
 
 
-    @Scheduled(fixedRate = CRON)
+    @Scheduled(fixedRate = FIXED_RATE_MS)
     public void saveTime() {
         if (jobEnabled) {
-            memoryQueue.getMemoryQueue().add(new Time()
-                    .setTime(LocalTime.now()));
+            memoryQueue.getMemoryQueue()
+                    .add(new Time()
+                            .setTime(LocalTime.now()));
 
             log.info("Add new time. Count = {}", memoryQueue.getMemoryQueue().size());
 

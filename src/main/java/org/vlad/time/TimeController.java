@@ -15,11 +15,9 @@ public class TimeController {
 
     private final TimeService timeService;
 
-    private final TimeMapper timeMapper;
-
 
     @GetMapping
     public List<TimeDto> getAll() {
-        return timeMapper.mapListToDto(timeService.getAll());
+        return timeService.getAll();
     }
 }

@@ -6,20 +6,11 @@ app:
 management:
   endpoints:
     web:
-      base-path: /
-      path-mapping:
-        info: status
-        prometheus: metrics
       exposure:
-        include: health, info, prometheus
+        include: health
     health:
       show-components: always
       show-details: always
-      group:
-        liveness:
-          show-details: always
-        readiness:
-          show-details: always
 
 # logging configuration
 logging:

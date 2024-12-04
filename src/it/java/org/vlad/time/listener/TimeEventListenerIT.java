@@ -1,11 +1,13 @@
 package org.vlad.time.listener;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.testcontainers.shaded.com.google.common.util.concurrent.Uninterruptibles;
 import org.vlad.IntegrationTest;
 import org.vlad.time.data.MemoryQueue;
 import org.vlad.time.job.TimeJobService;
@@ -23,18 +25,18 @@ public class TimeEventListenerIT extends IntegrationTest {
 
 
     @Test
-    void onApplicationEvent_when_lost_connection_for_db() throws InterruptedException {
+    void onApplicationEvent_when_lost_connection_for_db() {
         ReflectionTestUtils.setField(timeJobService, "jobEnabled", true);
 
-        Thread.sleep(5_000);
+        Uninterruptibles.sleepUninterruptibly(5L, TimeUnit.SECONDS);
 
         disconnectNetwork();
 
-        Thread.sleep(5_000);
+        Uninterruptibles.sleepUninterruptibly(5L, TimeUnit.SECONDS);
 
         connectNetwork();
 
-        Thread.sleep(3_000);
+        Uninterruptibles.sleepUninterruptibly(3L, TimeUnit.SECONDS);
 
         assertThat(memoryQueue.getMemoryQueue().size()).isLessThanOrEqualTo(1);
 

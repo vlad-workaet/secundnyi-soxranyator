@@ -2,6 +2,7 @@ package org.vlad.time;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.assertj.core.api.SoftAssertions;
@@ -11,6 +12,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.shaded.com.google.common.util.concurrent.Uninterruptibles;
 import org.vlad.IntegrationTest;
 import org.vlad.time.data.MemoryQueue;
 import org.vlad.time.dto.TimeDto;
@@ -55,10 +57,10 @@ public class TimeControllerIT extends IntegrationTest {
 
 
     @Test
-    void getAll_with_enabled_job() throws InterruptedException {
+    void getAll_with_enabled_job() {
         ReflectionTestUtils.setField(timeJobService, "jobEnabled", true);
 
-        Thread.sleep(5_000);
+        Uninterruptibles.sleepUninterruptibly(5L, TimeUnit.SECONDS);
 
         client.get()
                 .uri(URL_TEMPLATE)
@@ -75,7 +77,7 @@ public class TimeControllerIT extends IntegrationTest {
 
         ReflectionTestUtils.setField(timeJobService, "jobEnabled", false);
 
-        Thread.sleep(2_000);
+        Uninterruptibles.sleepUninterruptibly(2L, TimeUnit.SECONDS);
 
         assertThat(memoryQueue.getMemoryQueue().size()).isEqualTo(0);
     }
