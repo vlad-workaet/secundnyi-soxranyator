@@ -1,0 +1,39 @@
+app:
+  time:
+    job-enabled: true
+
+## Tuning mapping for actuator info to '/status' path
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+    health:
+      show-components: always
+      show-details: always
+
+# logging configuration
+logging:
+  config: config/logback.xml
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vlad
+    username: postgres
+    password: postgres
+    # Настройки HikariCP
+    hikari:
+      connection-test-query: SELECT 1
+      connection-timeout: 250     # Время ожидания соединения (5 секунд)
+      maximum-pool-size: 2        # Максимальное количество соединений в пуле
+      minimum-idle: 1              # Минимальное количество неактивных соединений
+      idle-timeout: 600000         # Время ожидания неактивного соединения (10 минут)
+      max-lifetime: 1800000        # Максимальное время жизни соединения (30 минут)
+      validation-timeout: 250     # Таймаут проверки соединения (5 секунд)
+  # liquibase configuration
+  jpa.properties.hibernate:
+    jdbc.lob.non_contextual_creation: true
+    dialect: org.hibernate.dialect.PostgreSQL10Dialect
+  liquibase:
+    change-log: classpath:liquibase/changelog.xml
+  application.name: secundnyi-soxranyator
